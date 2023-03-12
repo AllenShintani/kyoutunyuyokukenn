@@ -49,6 +49,7 @@ const Home: NextPage = () => {
     canvaselem.width = videoConstraints.width
     canvaselem.height = videoConstraints.height
     const ctx = canvaselem.getContext('2d')
+
     setContext(ctx)
   }, [])
 
@@ -67,9 +68,17 @@ const Home: NextPage = () => {
         img.onload = async () => {
           //canvas上に画像を描画
           context.drawImage(img, 0, 0)
-          //画像処理可能なImageData型に変換
+          //線を引く
+          context.beginPath()
+          context.moveTo(250, 0)
+          context.lineTo(250, 400)
+          context.strokeStyle = 'red'
+          context.lineWidth = 5
+          context.stroke()
+          context.beginPath()
+          //バグが内在しているので注意。一般化されていない。
           const imageData = context.getImageData(0, 0, 720, 360)
-          //画像の色の平均値を取得
+          console.log(imageData.data)
           const aveImageData = imageData
           //処理が終わったImageData型の画像を取得、保存
           const result = AverageColor(
@@ -80,10 +89,6 @@ const Home: NextPage = () => {
           oldImgData = result
           const exportURL = exportJpeg(result)
           setAfterUrl(exportURL as string)
-          //const s3URL = await s3GetObject(s3, command)
-          //setS3AfterUrl(s3URL)
-          //console.log(exportURL)
-          //URLsの数と同じ
         }
       }
 
@@ -102,7 +107,7 @@ const Home: NextPage = () => {
           <button
             onClick={() => {
               setCaptureEnable(true)
-              interval(50)
+              interval(3000)
             }}
           >
             開始
