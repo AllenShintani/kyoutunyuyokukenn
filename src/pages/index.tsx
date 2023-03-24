@@ -6,6 +6,7 @@ import styled from 'styled-components'
 import { useEffect } from 'react'
 import { AverageColor } from 'src/components/AverageColor'
 import { exportJpeg } from 'src/components/ExportJpeg'
+import { CulcRGBA } from '@/components/CulcRGBA'
 
 const Container = styled.div`
   display: flex;
@@ -68,17 +69,73 @@ const Home: NextPage = () => {
         img.onload = async () => {
           //canvas上に画像を描画
           context.drawImage(img, 0, 0)
-          //線を引く
+
+          //ここで色を判別(これは共通入浴券げ変わるたびに変更しなければいけない)
+          const rgba1 = context.getImageData(250, 50, 1, 1)
+          const rgba2 = context.getImageData(290, 340, 1, 1)
+          const rgba3 = context.getImageData(350, 250, 1, 1)
+          const rgba4 = context.getImageData(470, 20, 1, 1)
+          const rgba5 = context.getImageData(260, 320, 1, 1)
+          const rgba6 = context.getImageData(480, 250, 1, 1)
+          const ArrayRgba = [
+            rgba1.data,
+            rgba2.data,
+            rgba3.data,
+            rgba4.data,
+            rgba5.data,
+            rgba6.data,
+          ]
+          const JudgeCard: boolean = CulcRGBA(ArrayRgba)
+          console.log(JudgeCard)
+          //線を引く(これは都度変更しなければいけないわけではないが、視覚的に確認するため)
           context.beginPath()
-          context.moveTo(250, 0)
-          context.lineTo(250, 400)
-          context.strokeStyle = 'red'
+          //上から下に
+          context.moveTo(250, 50)
+          context.lineTo(250, 50)
           context.lineWidth = 5
           context.stroke()
           context.beginPath()
-          //バグが内在しているので注意。一般化されていない。
+          //
+          context.beginPath()
+          context.moveTo(290, 340)
+          context.lineTo(290, 330)
+          context.lineWidth = 5
+          context.stroke()
+          //
+          context.beginPath()
+          context.moveTo(350, 250)
+          context.lineTo(350, 240)
+          context.lineWidth = 5
+          context.stroke()
+          //
+          context.beginPath()
+          context.moveTo(470, 20)
+          context.lineTo(470, 10)
+          context.lineWidth = 5
+          context.stroke()
+          //
+          context.beginPath()
+          context.moveTo(260, 320)
+          context.lineTo(260, 310)
+          context.lineWidth = 5
+          context.stroke()
+          //
+          context.beginPath()
+          context.moveTo(480, 250)
+          context.lineTo(480, 240)
+          context.lineWidth = 5
+          context.stroke()
+          context.beginPath()
+          /*
+          OCR読み取りが正しいか判断するプログラム
+          */
+
+          /*
+          共通入浴券と認識できた時の処理
+          */
+
+          //ここから下の処理は視覚的に確認するためのもので、実際の挙動には関係ない
           const imageData = context.getImageData(0, 0, 720, 360)
-          console.log(imageData.data)
           const aveImageData = imageData
           //処理が終わったImageData型の画像を取得、保存
           const result = AverageColor(
@@ -107,7 +164,7 @@ const Home: NextPage = () => {
           <button
             onClick={() => {
               setCaptureEnable(true)
-              interval(3000)
+              interval(500)
             }}
           >
             開始

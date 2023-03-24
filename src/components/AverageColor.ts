@@ -10,7 +10,7 @@ export const AverageColor = (
 
   //それまでcanvasに描かれた画像が0枚ならimageDataだけ計算して返す
   if (oldImgData === null) {
-    console.log('canvasに書かれた画像はなし')
+    //console.log('canvasに書かれた画像はなし')
     return aveImageData
   }
 
@@ -39,7 +39,7 @@ export const AverageColor = (
         tempaveImageDatas[pos + 3] += datas[pos + 3]
       }
     }
-    8
-    return aveImageData
+
+    return imgData
   }
 }
