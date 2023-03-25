@@ -34,8 +34,13 @@ const videoConstraints = {
 }
 
 const OCRImg = {
+  width: 240,
+  height: 160,
+  facingMode: 'user',
+}
+const OCR2Img = {
   width: 230,
-  height: 170,
+  height: 80,
   facingMode: 'user',
 }
 
@@ -47,6 +52,8 @@ const Home: NextPage = () => {
   //加工した画像のURL
   const [afterUrl, setAfterUrl] = useState<string | undefined>(undefined)
   const [ocrUrl, setOcrUrl] = useState<string | undefined>(undefined)
+  const [ocr2Url, setOcr2Url] = useState<string | undefined>(undefined)
+
   const [context, setContext] = useState<CanvasRenderingContext2D | null>(null)
   //const inputRef = useRef<HTMLInputElement>(null)
   const [worker, setWorker] = useState<any>(null)
@@ -157,12 +164,27 @@ const Home: NextPage = () => {
           //ここから下の処理は視覚的に確認するためのもので、実際の挙動には関係ない
           const imageData = context.getImageData(0, 0, 720, 360)
           //OCRの読み取り座標。都度変更必要
-          const OCRData = context.getImageData(260, 40, 250, 200)
+          const OCRData = context.getImageData(
+            260,
+            40,
+            OCRImg.width,
+            OCRImg.height
+          )
+          const OCR2Data = context.getImageData(
+            260,
+            120,
+            OCR2Img.width,
+            OCR2Img.height
+          )
           const exportURL = exportJpeg(imageData, videoConstraints)
           const exportOCR = exportJpeg(OCRData, OCRImg)
+          const exportOCR2 = exportJpeg(OCR2Data, OCR2Img)
           setOcrUrl(exportOCR as string)
+          setOcr2Url(exportOCR2 as string)
           setAfterUrl(exportURL as string)
-          recognizeImage(exportOCR as string, worker)
+          //recognizeImage(exportOCR as string, worker)
+          recognizeImage(exportOCR2 as string, worker)
+          //processImage(exportOCR as string)
         }
       }
 
@@ -233,6 +255,16 @@ const Home: NextPage = () => {
               <canvas
                 width={OCRImg.width}
                 height={OCRImg.height}
+              />
+            </div>
+            <div>
+              <img
+                src={ocr2Url}
+                alt="OCR"
+              />
+              <canvas
+                width={OCR2Img.width}
+                height={OCR2Img.height}
               />
             </div>
           </>
