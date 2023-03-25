@@ -4,9 +4,10 @@ import Webcam from 'react-webcam'
 import type { NextPage } from 'next'
 import styled from 'styled-components'
 import { useEffect } from 'react'
-import { AverageColor } from 'src/components/AverageColor'
+import { createWorker } from 'tesseract.js'
 import { exportJpeg } from 'src/components/ExportJpeg'
 import { CulcRGBA } from '@/components/CulcRGBA'
+import { recognizeImage } from '@/components/RecognizeImage'
 
 const Container = styled.div`
   display: flex;
@@ -32,7 +33,11 @@ const videoConstraints = {
   facingMode: 'user',
 }
 
-let oldImgData: ImageData | null = null
+const OCRImg = {
+  width: 230,
+  height: 170,
+  facingMode: 'user',
+}
 
 const Home: NextPage = () => {
   const [isCaptureEnable, setCaptureEnable] = useState<boolean>(false)
@@ -41,7 +46,10 @@ const Home: NextPage = () => {
   const [url, setUrl] = useState<string | null>(null)
   //加工した画像のURL
   const [afterUrl, setAfterUrl] = useState<string | undefined>(undefined)
+  const [ocrUrl, setOcrUrl] = useState<string | undefined>(undefined)
   const [context, setContext] = useState<CanvasRenderingContext2D | null>(null)
+  //const inputRef = useRef<HTMLInputElement>(null)
+  const [worker, setWorker] = useState<any>(null)
   //s3からgetした加工し終わった画像のURL
 
   //canvasの要素を作成
@@ -52,6 +60,18 @@ const Home: NextPage = () => {
     const ctx = canvaselem.getContext('2d')
 
     setContext(ctx)
+  }, [])
+
+  useEffect(() => {
+    const initWorker = async () => {
+      const newWorker = await createWorker() // Add 'await' here
+      await newWorker.load()
+      await newWorker.loadLanguage('jpn')
+      await newWorker.initialize('jpn')
+      setWorker(newWorker)
+      console.log('workerEffect実行')
+    }
+    initWorker()
   }, [])
 
   const interval = (dumyfps: number) => {
@@ -136,24 +156,19 @@ const Home: NextPage = () => {
 
           //ここから下の処理は視覚的に確認するためのもので、実際の挙動には関係ない
           const imageData = context.getImageData(0, 0, 720, 360)
-          const aveImageData = imageData
-          //処理が終わったImageData型の画像を取得、保存
-          const result = AverageColor(
-            aveImageData,
-            oldImgData,
-            fps
-          ) as ImageData
-          oldImgData = result
-          const exportURL = exportJpeg(result)
+          //OCRの読み取り座標。都度変更必要
+          const OCRData = context.getImageData(260, 40, 250, 200)
+          const exportURL = exportJpeg(imageData, videoConstraints)
+          const exportOCR = exportJpeg(OCRData, OCRImg)
+          setOcrUrl(exportOCR as string)
           setAfterUrl(exportURL as string)
+          recognizeImage(exportOCR as string, worker)
         }
       }
 
       interval(dumyfps)
     }, dumyfps)
   }
-
-  //if (process.env.)
 
   return (
     <Container>
@@ -208,6 +223,16 @@ const Home: NextPage = () => {
                 id="canvas-out"
                 width={videoConstraints.width}
                 height={videoConstraints.height}
+              />
+            </div>
+            <div>
+              <img
+                src={ocrUrl}
+                alt="OCR"
+              />
+              <canvas
+                width={OCRImg.width}
+                height={OCRImg.height}
               />
             </div>
           </>

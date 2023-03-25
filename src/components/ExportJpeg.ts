@@ -1,11 +1,12 @@
-const videoConstraints = {
-  width: 720,
-  height: 360,
-  facingMode: 'user',
-}
-
 //canvasを作成
-export const exportJpeg = (AveImageData: ImageData) => {
+export const exportJpeg = (
+  AveImageData: ImageData,
+  videoConstraints: {
+    width: number
+    height: number
+    facingMode: string
+  }
+) => {
   const exportcanvas = document.createElement('canvas')
   exportcanvas.width = videoConstraints.width
   exportcanvas.height = videoConstraints.height
