@@ -27,7 +27,7 @@ export const CulcRGBA = (ArrayRgba: Uint8ClampedArray[]) => {
   const TrueAllRgba = TrueArrayRgba.flatMap((num) => num)
   console.log(TrueAllRgba)
   for (let i = 0; i < IsNumRgba.length; i++) {
-    if (Math.abs(TrueAllRgba[i] - IsNumRgba[i]) > 20) {
+    if (Math.abs(TrueAllRgba[i] - IsNumRgba[i]) > 25) {
       console.log(i)
       console.log(Math.abs(TrueAllRgba[i] - IsNumRgba[i]))
       return false

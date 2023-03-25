@@ -4,10 +4,8 @@ import Webcam from 'react-webcam'
 import type { NextPage } from 'next'
 import styled from 'styled-components'
 import { useEffect } from 'react'
-import { createWorker } from 'tesseract.js'
 import { exportJpeg } from 'src/components/ExportJpeg'
 import { CulcRGBA } from '@/components/CulcRGBA'
-import { recognizeImage } from '@/components/RecognizeImage'
 
 const Container = styled.div`
   display: flex;
@@ -33,17 +31,6 @@ const videoConstraints = {
   facingMode: 'user',
 }
 
-const OCRImg = {
-  width: 240,
-  height: 160,
-  facingMode: 'user',
-}
-const OCR2Img = {
-  width: 230,
-  height: 80,
-  facingMode: 'user',
-}
-
 const Home: NextPage = () => {
   const [isCaptureEnable, setCaptureEnable] = useState<boolean>(false)
   const webcamRef = useRef<Webcam>(null)
@@ -51,12 +38,7 @@ const Home: NextPage = () => {
   const [url, setUrl] = useState<string | null>(null)
   //加工した画像のURL
   const [afterUrl, setAfterUrl] = useState<string | undefined>(undefined)
-  const [ocrUrl, setOcrUrl] = useState<string | undefined>(undefined)
-  const [ocr2Url, setOcr2Url] = useState<string | undefined>(undefined)
-
   const [context, setContext] = useState<CanvasRenderingContext2D | null>(null)
-  //const inputRef = useRef<HTMLInputElement>(null)
-  const [worker, setWorker] = useState<any>(null)
   //s3からgetした加工し終わった画像のURL
 
   //canvasの要素を作成
@@ -67,18 +49,6 @@ const Home: NextPage = () => {
     const ctx = canvaselem.getContext('2d')
 
     setContext(ctx)
-  }, [])
-
-  useEffect(() => {
-    const initWorker = async () => {
-      const newWorker = await createWorker() // Add 'await' here
-      await newWorker.load()
-      await newWorker.loadLanguage('jpn')
-      await newWorker.initialize('jpn')
-      setWorker(newWorker)
-      console.log('workerEffect実行')
-    }
-    initWorker()
   }, [])
 
   const interval = (dumyfps: number) => {
@@ -163,34 +133,16 @@ const Home: NextPage = () => {
 
           //ここから下の処理は視覚的に確認するためのもので、実際の挙動には関係ない
           const imageData = context.getImageData(0, 0, 720, 360)
-          //OCRの読み取り座標。都度変更必要
-          const OCRData = context.getImageData(
-            260,
-            40,
-            OCRImg.width,
-            OCRImg.height
-          )
-          const OCR2Data = context.getImageData(
-            260,
-            120,
-            OCR2Img.width,
-            OCR2Img.height
-          )
           const exportURL = exportJpeg(imageData, videoConstraints)
-          const exportOCR = exportJpeg(OCRData, OCRImg)
-          const exportOCR2 = exportJpeg(OCR2Data, OCR2Img)
-          setOcrUrl(exportOCR as string)
-          setOcr2Url(exportOCR2 as string)
           setAfterUrl(exportURL as string)
-          //recognizeImage(exportOCR as string, worker)
-          recognizeImage(exportOCR2 as string, worker)
-          //processImage(exportOCR as string)
         }
       }
 
       interval(dumyfps)
     }, dumyfps)
   }
+
+  //if (process.env.)
 
   return (
     <Container>
@@ -245,26 +197,6 @@ const Home: NextPage = () => {
                 id="canvas-out"
                 width={videoConstraints.width}
                 height={videoConstraints.height}
-              />
-            </div>
-            <div>
-              <img
-                src={ocrUrl}
-                alt="OCR"
-              />
-              <canvas
-                width={OCRImg.width}
-                height={OCRImg.height}
-              />
-            </div>
-            <div>
-              <img
-                src={ocr2Url}
-                alt="OCR"
-              />
-              <canvas
-                width={OCR2Img.width}
-                height={OCR2Img.height}
               />
             </div>
           </>
