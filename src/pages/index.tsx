@@ -52,7 +52,6 @@ const Home: NextPage = () => {
   }, [])
 
   const interval = (dumyfps: number) => {
-    const fps = 1000 / dumyfps
     setTimeout(() => {
       //元のwebカメラの動画のスクショ
       const movie = webcamRef.current?.getScreenshot() //as string | null
@@ -85,6 +84,7 @@ const Home: NextPage = () => {
           const JudgeCard: boolean = CulcRGBA(ArrayRgba)
           console.log(JudgeCard)
           //線を引く(これは都度変更しなければいけないわけではないが、視覚的に確認するため)
+          /*
           context.beginPath()
           //上から下に
           context.moveTo(250, 50)
@@ -123,8 +123,6 @@ const Home: NextPage = () => {
           context.lineWidth = 5
           context.stroke()
           context.beginPath()
-          /*
-          OCR読み取りが正しいか判断するプログラム
           */
 
           /*
