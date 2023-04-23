@@ -34,12 +34,9 @@ const videoConstraints = {
 const Home: NextPage = () => {
   const [isCaptureEnable, setCaptureEnable] = useState<boolean>(false)
   const webcamRef = useRef<Webcam>(null)
-  //動画から何も加工していない画像のURL
   const [url, setUrl] = useState<string | null>(null)
-  //加工した画像のURL
   const [afterUrl, setAfterUrl] = useState<string | undefined>(undefined)
   const [context, setContext] = useState<CanvasRenderingContext2D | null>(null)
-  //s3からgetした加工し終わった画像のURL
 
   //canvasの要素を作成
   useEffect(() => {
